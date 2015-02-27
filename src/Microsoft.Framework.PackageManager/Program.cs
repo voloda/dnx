@@ -84,6 +84,7 @@ namespace Microsoft.Framework.PackageManager
             {
                 c.Description = "Bundle application for deployment";
 
+                var optionSymbols = c.Option("--symbol", "Generate ni symbols", CommandOptionType.NoValue);
                 var argProject = c.Argument("[project]", "Path to project, default is current directory");
                 var optionOut = c.Option("-o|--out <PATH>", "Where does it go", CommandOptionType.SingleValue);
                 var optionConfiguration = c.Option("--configuration <CONFIGURATION>", "The configuration to use for deployment (Debug|Release|{Custom})",
@@ -109,6 +110,7 @@ namespace Microsoft.Framework.PackageManager
                 {
                     var options = new BundleOptions
                     {
+                        Symbols = optionSymbols.HasValue(),
                         OutputDir = optionOut.Value(),
                         ProjectDir = argProject.Value ?? System.IO.Directory.GetCurrentDirectory(),
                         Configuration = optionConfiguration.Value() ?? "Debug",

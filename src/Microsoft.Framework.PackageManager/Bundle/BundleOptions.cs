@@ -8,6 +8,8 @@ namespace Microsoft.Framework.PackageManager.Bundle
 {
     public class BundleOptions
     {
+        public bool Symbols { get; set; }
+
         public string OutputDir { get; set; }
 
         public string ProjectDir { get; set; }
