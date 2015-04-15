@@ -123,20 +123,25 @@ void FreeExpandedCommandLineArguments(int nArgc, LPTSTR* ppszArgv)
     delete[] ppszArgv;
 }
 
-bool ExpandCommandLineArguments(int nArgc, LPTSTR* ppszArgv, int& nExpandedArgc, LPTSTR*& ppszExpandedArgv)
+dnx::char_t* GetAppBaseParameterValue(int argc, dnx::char_t* argv[])
 {
-    if (nArgc == 0)
+    for (auto i = 0; i < argc - 1; ++i)
     {
-        return false;
+        if (StringsEqual(argv[i], _X("--appbase")))
+        {
+            return argv[i + 1];
+        }
     }
 
-    for (int i = 0; i < nArgc; ++i)
+    return nullptr;
+}
+
+bool ExpandCommandLineArguments(int nArgc, LPTSTR* ppszArgv, int& nExpandedArgc, LPTSTR*& ppszExpandedArgv)
+{
+    // If no args or '--appbase' is already given and it has a value
+    if (nArgc == 0 || GetAppBaseParameterValue(nArgc, ppszArgv))
     {
-        // If '--appbase' is already given and it has a value
-        if (StringsEqual(ppszArgv[i], _T("--appbase")) && (i < nArgc - 1))
-        {
-            return false;
-        }
+        return false;
     }
 
     nExpandedArgc = nArgc + 2;
@@ -225,19 +230,6 @@ bool ExpandCommandLineArguments(int nArgc, LPTSTR* ppszArgv, int& nExpandedArgc,
     }
 
     return true;
-}
-
-dnx::char_t* GetAppBaseParameterValue(int argc, dnx::char_t* argv[])
-{
-    for (int i = 0; i < argc; ++i)
-    {
-        if ((i < argc - 1) && StringsEqual(argv[i], _X("--appbase")))
-        {
-            return argv[i + 1];
-        }
-    }
-
-    return nullptr;
 }
 
 bool GetApplicationBase(const dnx::xstring_t& currentDirectory, int argc, dnx::char_t* argv[], /*out*/ dnx::char_t* fullAppBasePath)
