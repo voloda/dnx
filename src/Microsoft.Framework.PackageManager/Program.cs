@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation. All rights reserved.
+﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -67,7 +67,8 @@ namespace Microsoft.Framework.PackageManager
                 c.OnExecute(async () =>
                 {
                     var feedOptions = feedCommandLineOptions.GetOptions();
-                    var command = new RestoreCommand(_environment);
+                    var isMono = ((IRuntimeEnvironment)_hostServices.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+                    var command = new RestoreCommand(_environment, isMono);
                     command.Reports = CreateReports(optionVerbose.HasValue(), feedOptions.Quiet);
                     command.RestoreDirectory = argRoot.Value;
                     command.FeedOptions = feedOptions;
@@ -227,7 +228,8 @@ namespace Microsoft.Framework.PackageManager
                     addCmd.Version = argVersion.Value;
                     addCmd.ProjectDir = argProject.Value;
 
-                    var restoreCmd = new RestoreCommand(_environment);
+                    var isMono = ((IRuntimeEnvironment)_hostServices.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+                    var restoreCmd = new RestoreCommand(_environment, isMono);
                     restoreCmd.Reports = reports;
                     restoreCmd.FeedOptions = feedOptions;
 
@@ -404,7 +406,7 @@ namespace Microsoft.Framework.PackageManager
                     }
 
                     var command = new DependencyListCommand(options, _environment.RuntimeFramework);
-                    return command.Execute();
+                    return command.Execute(_hostServices);
                 });
             });
 
@@ -437,8 +439,9 @@ namespace Microsoft.Framework.PackageManager
                         var command = new InstallGlobalCommand(
                                 _environment,
                                 string.IsNullOrEmpty(feedOptions.TargetPackagesFolder) ?
-                                    AppCommandsFolderRepository.CreateDefault() :
-                                    AppCommandsFolderRepository.Create(feedOptions.TargetPackagesFolder));
+                                    AppCommandsFolderRepository.CreateDefault(_hostServices) :
+                                    AppCommandsFolderRepository.Create(feedOptions.TargetPackagesFolder, _hostServices),
+                                _hostServices);
 
                         command.FeedOptions = feedOptions;
                         command.Reports = CreateReports(optionVerbose.HasValue(), feedOptions.Quiet);
@@ -470,7 +473,7 @@ namespace Microsoft.Framework.PackageManager
                     {
                         var command = new UninstallCommand(
                             _environment,
-                            AppCommandsFolderRepository.CreateDefault(),
+                            AppCommandsFolderRepository.CreateDefault(_hostServices),
                             reports: CreateReports(optionVerbose.HasValue(), quiet: false));
 
                         command.NoPurge = optNoPurge.HasValue();
@@ -511,7 +514,8 @@ namespace Microsoft.Framework.PackageManager
                     command.InPlace = optInPlace.HasValue();
                     command.Framework = optFramework.Value();
 
-                    var success = command.ExecuteCommand();
+                    var isMono = ((IRuntimeEnvironment)_hostServices.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+                    var success = command.ExecuteCommand(isMono);
 
                     return success ? 0 : 1;
                 });
