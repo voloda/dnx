@@ -24,14 +24,13 @@ namespace Microsoft.Framework.Runtime
                     return CreateCollection(projectDirectory, defaultPatterns.ToArray());
                 }
 
-                string valueInString = rawProject.ValueAsString(propertyName);
+                var valueInString = rawProject.ValueAsString(propertyName);
                 if (valueInString != null)
                 {
                     return CreateCollection(projectDirectory, valueInString);
                 }
 
-                // TODO: simplify after introduce JsonArray
-                string[] valuesInArray = rawProject.ValueAsStringArray(propertyName);
+                var valuesInArray = rawProject.ValueAsStringArray(propertyName);
                 if (valuesInArray != null)
                 {
                     return CreateCollection(projectDirectory, valuesInArray.Select(s => s.ToString()).ToArray());

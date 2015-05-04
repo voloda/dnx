@@ -169,7 +169,8 @@ namespace Microsoft.Framework.Runtime
             var project = new Project();
 
             var deserializer = new JsonDeserializer();
-            var rawProject = deserializer.Deserialize(stream) as JsonObject;
+            var reader = new StreamReader(stream);
+            var rawProject = deserializer.Deserialize(reader) as JsonObject;
             if (rawProject == null)
             {
                 throw FileFormatException.Create(
@@ -353,7 +354,7 @@ namespace Microsoft.Framework.Runtime
             string propertyName,
             bool isGacOrFrameworkReference)
         {
-            var dependencies = settings.ValueAsJsonObject(propertyName);  //settings[propertyName] as JObject;
+            var dependencies = settings.ValueAsJsonObject(propertyName);
             if (dependencies != null)
             {
                 foreach (var dependencyKey in dependencies.Keys)
@@ -627,7 +628,6 @@ namespace Microsoft.Framework.Runtime
                 Dependencies = new List<LibraryDependency>()
             };
 
-            //var properties = d targetFramework.Value.Value<JObject>();
             var frameworkDependencies = new List<LibraryDependency>();
 
             PopulateDependencies(

@@ -14,5 +14,18 @@ namespace Microsoft.Framework.Runtime.Json
         public int Line { get; private set; }
 
         public int Column { get; private set; }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as JsonPosition;
+            return other != null &&
+                   other.Line == Line &&
+                   other.Column == Column;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

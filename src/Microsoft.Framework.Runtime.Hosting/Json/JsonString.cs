@@ -6,8 +6,8 @@ namespace Microsoft.Framework.Runtime.Json
     {
         private readonly string _value;
 
-        public JsonString(string value, JsonToken token)
-            : base(token.Position)
+        public JsonString(string value, JsonPosition position)
+            : base(position)
         {
             if (value == null)
             {

@@ -5,6 +5,36 @@ namespace Microsoft.Framework.Runtime.Json
 {
     internal class JsonDeserializerResource
     {
+        internal static string Format_IllegalTrailingCharacterAfterLiteral(int value, string literal)
+        {
+            return string.Format("Illegal character {0} ({1:X4}) trails the literal name {2}", (char)value, value, literal);
+        }
+
+        internal static string Format_UnrecognizedLiteral(string literal)
+        {
+            return string.Format("Unrecognized json literal. {0} is expected.", literal);
+        }
+
+        internal static string Format_UnexpectedToken(string tokenValue, JsonTokenType type)
+        {
+            return string.Format("Unexpected token, type: {0} value: {1}.", type.ToString(), tokenValue);
+        }
+
+        internal static string Format_DuplicateObjectMemberName(string memberName)
+        {
+            return string.Format("Duplicate member name {0}", memberName);
+        }
+
+        internal static string Format_InvalidFloatNumberFormat(string raw)
+        {
+            return string.Format("Invalid float number format: {0}.", raw);
+        }
+
+        internal static string Format_FloatNumberOverflow(string raw)
+        {
+            return string.Format("Float number overflow: {0}.", raw);
+        }
+
         internal static string JSON_BadEscape
         {
             get { return "Unrecognized escape sequence."; }
@@ -18,11 +48,6 @@ namespace Microsoft.Framework.Runtime.Json
         internal static string JSON_ExpectedOpenBrace
         {
             get { return "Invalid object passed in, '{' expected."; }
-        }
-
-        internal static string JSON_IllegalPrimitive
-        {
-            get { return "Invalid JSON primitive: {0}."; }
         }
 
         internal static string JSON_InvalidArrayEnd
@@ -45,11 +70,6 @@ namespace Microsoft.Framework.Runtime.Json
             get { return "Invalid array passed in, '[' expected."; }
         }
 
-        internal static string JSON_InvalidMaxJsonLength
-        {
-            get { return "Value must be a positive integer."; }
-        }
-
         internal static string JSON_InvalidMemberName
         {
             get { return "Invalid object passed in, member name expected."; }
@@ -60,29 +80,9 @@ namespace Microsoft.Framework.Runtime.Json
             get { return "Invalid object passed in, ':' or '}' expected."; }
         }
 
-        internal static string JSON_InvalidRecursionLimit
+        internal static string JSON_OpenString
         {
-            get { return "RecursionLimit must be a positive integer."; }
-        }
-
-        internal static string JSON_MaxJsonLengthExceeded
-        {
-            get { return "Error during serialization or deserialization using the JSON JavaScriptSerializer. The length of the string exceeds the value set on the maxJsonLength property."; }
-        }
-
-        internal static string JSON_StringNotQuoted
-        {
-            get { return "Invalid string passed in, '\\\"' expected."; }
-        }
-
-        internal static string JSON_UnterminatedString
-        {
-            get { return "Unterminated string passed in."; }
-        }
-
-        internal static string JSON_MaxJsonDeserializerMembers
-        {
-            get { return "The maximum number of items has already been deserialized into a single dictionary by the JavaScriptSerializer.The value is '{0}'."; }
+            get { return "Invalid open string, '\"' is expected."; }
         }
     }
 }

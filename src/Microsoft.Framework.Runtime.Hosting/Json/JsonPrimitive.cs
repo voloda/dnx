@@ -1,6 +1,9 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
+using System.Globalization;
+
 namespace Microsoft.Framework.Runtime.Json
 {
     internal class JsonPrimitive : JsonValue
@@ -13,78 +16,23 @@ namespace Microsoft.Framework.Runtime.Json
         public JsonNull(JsonPosition position) : base(position) { }
     }
 
-    /// Though Json doesn't distinguish between float and integer, JsonInteger
-    /// is nice to have from the perspective of easy data consuming.
-    internal class JsonInteger : JsonPrimitive
-    {
-        public JsonInteger(int value, JsonPosition position)
-            : base(position)
-        {
-            Value = value;
-        }
-
-        public int Value { get; private set; }
-
-        public static implicit operator int (JsonInteger jsonInteger)
-        {
-            return jsonInteger.Value;
-        }
-    }
-
-    internal class JsonLong : JsonPrimitive
-    {
-        public JsonLong(long value, JsonPosition position)
-            : base(position)
-        {
-            Value = value;
-        }
-
-        public long Value { get; private set; }
-
-        public static implicit operator long (JsonLong jsonLong)
-        {
-            return jsonLong.Value;
-        }
-    }
-
-    internal class JsonDecimal : JsonPrimitive
-    {
-        public JsonDecimal(decimal value, JsonPosition position)
-            : base(position)
-        {
-            Value = value;
-        }
-
-        public decimal Value { get; private set; }
-
-        public static implicit operator decimal (JsonDecimal jsonDecimal)
-        {
-            return jsonDecimal.Value;
-        }
-    }
-
-    internal class JsonDouble : JsonPrimitive
-    {
-        public JsonDouble(double value, JsonPosition position)
-            : base(position)
-        {
-            Value = value;
-        }
-
-        public double Value { get; private set; }
-
-        public static implicit operator double (JsonDouble jsonDouble)
-        {
-            return jsonDouble.Value;
-        }
-    }
-
     internal class JsonBoolean : JsonPrimitive
     {
-        public JsonBoolean(bool value, JsonPosition position)
-            : base(position)
+        public JsonBoolean(JsonToken token)
+            : base(token.GetPosition())
         {
-            Value = value;
+            if (token.Type == JsonTokenType.True)
+            {
+                Value = true;
+            }
+            else if (token.Type == JsonTokenType.False)
+            {
+                Value = false;
+            }
+            else
+            {
+                throw new ArgumentException("Token value should be either True or False.", nameof(token));
+            }
         }
 
         public bool Value { get; private set; }
@@ -92,6 +40,48 @@ namespace Microsoft.Framework.Runtime.Json
         public static implicit operator bool (JsonBoolean jsonBoolean)
         {
             return jsonBoolean.Value;
+        }
+    }
+
+    internal class JsonNumber : JsonPrimitive
+    {
+        private readonly string _raw;
+        private readonly double _double;
+
+        public JsonNumber(JsonToken token)
+            : base(token.GetPosition())
+        {
+            try
+            {
+                _raw = token.Value;
+                _double = double.Parse(_raw, NumberStyles.Float);
+            }
+            catch (FormatException ex)
+            {
+                throw new JsonDeserializerException(
+                    JsonDeserializerResource.Format_InvalidFloatNumberFormat(_raw),
+                    ex,
+                    token.Line,
+                    token.Column);
+            }
+            catch (OverflowException ex)
+            {
+                throw new JsonDeserializerException(
+                    JsonDeserializerResource.Format_FloatNumberOverflow(_raw),
+                    ex,
+                    token.Line,
+                    token.Column);
+            }
+        }
+
+        public double Double
+        {
+            get { return _double; }
+        }
+
+        public int Int
+        {
+            get { return (int)_double; }
         }
     }
 }

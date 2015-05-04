@@ -113,8 +113,11 @@ namespace Microsoft.Framework.Runtime.Tests.FileGlobbing
 
         private JsonObject Deserialize(string content)
         {
-            var deserializer = new JsonDeserializer();
-            return deserializer.Deserialize(content) as JsonObject;
+            using (var reader = new StringReader(content))
+            {
+                var deserializer = new JsonDeserializer();
+                return deserializer.Deserialize(reader) as JsonObject;
+            }
         }
 
         private IEnumerable<string> NormalizePatterns(params string[] patterns)

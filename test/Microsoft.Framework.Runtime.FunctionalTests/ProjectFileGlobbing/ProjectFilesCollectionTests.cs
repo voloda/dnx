@@ -519,13 +519,16 @@ namespace Microsoft.Framework.Runtime.FunctionalTests.ProjectFileGlobbing
 
         protected override IProjectFilesCollection CreateFilesCollection(string jsonContent, string projectDir)
         {
-            var deserializer = new JsonDeserializer();
-            var rawProject = deserializer.Deserialize(jsonContent) as JsonObject;
+            using (var reader = new StringReader(jsonContent))
+            {
+                var deserializer = new JsonDeserializer();
+                var rawProject = deserializer.Deserialize(reader) as JsonObject;
 
-            projectDir = Path.Combine(Root.DirPath, PathHelper.NormalizeSeparator(projectDir));
-            var filesCollection = new ProjectFilesCollection(rawProject, projectDir, string.Empty);
+                projectDir = Path.Combine(Root.DirPath, PathHelper.NormalizeSeparator(projectDir));
+                var filesCollection = new ProjectFilesCollection(rawProject, projectDir, string.Empty);
 
-            return filesCollection;
+                return filesCollection;
+            }
         }
     }
 }
