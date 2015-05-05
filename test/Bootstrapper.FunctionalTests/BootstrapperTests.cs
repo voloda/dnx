@@ -94,7 +94,7 @@ namespace Bootstrapper.FunctionalTests
         public void BootstrapperInvokesApplicationHostWithInferredAppBase_ProjectDirAsArgument(string flavor, string os, string architecture)
         {
             using (var runtimeHomeDir = TestUtils.GetRuntimeHomeDir(flavor, os, architecture))
-            using (var tempSamplesDir = BootstrapperTestUtils.PrepareTemporarySamplesFolder(runtimeHomeDir))
+            using (var tempSamplesDir = TestUtils.PrepareTemporarySamplesFolder(runtimeHomeDir))
             {
                 var testAppPath = Path.Combine(tempSamplesDir, "HelloWorld");
 
@@ -124,7 +124,7 @@ command
         public void BootstrapperInvokesApplicationHostWithInferredAppBase_ProjectFileAsArgument(string flavor, string os, string architecture)
         {
             using (var runtimeHomeDir = TestUtils.GetRuntimeHomeDir(flavor, os, architecture))
-            using (var tempSamplesDir = BootstrapperTestUtils.PrepareTemporarySamplesFolder(runtimeHomeDir))
+            using (var tempSamplesDir = TestUtils.PrepareTemporarySamplesFolder(runtimeHomeDir))
             {
                 var testAppPath = Path.Combine(tempSamplesDir, "HelloWorld");
                 var testAppProjectFile = Path.Combine(testAppPath, Project.ProjectFileName);
@@ -157,7 +157,7 @@ command
             var outputFolder = flavor == "coreclr" ? "dnxcore50" : "dnx451";
 
             using (var runtimeHomeDir = TestUtils.GetRuntimeHomeDir(flavor, os, architecture))
-            using (var tempSamplesDir = BootstrapperTestUtils.PrepareTemporarySamplesFolder(runtimeHomeDir))
+            using (var tempSamplesDir = TestUtils.PrepareTemporarySamplesFolder(runtimeHomeDir))
             using (var tempDir = TestUtils.CreateTempDir())
             {
                 var sampleAppRoot = Path.Combine(tempSamplesDir, "HelloWorld");
