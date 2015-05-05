@@ -30,7 +30,8 @@ namespace Microsoft.Framework.Runtime.Roslyn
                 { "CS1705", ReportDiagnostic.Suppress }
             });
 
-            if(((IRuntimeEnvironment)services.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono")
+            var isMono = ((IRuntimeEnvironment)services.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+            if (isMono)
             {
                 options = options.WithConcurrentBuild(concurrentBuild: false);
             }

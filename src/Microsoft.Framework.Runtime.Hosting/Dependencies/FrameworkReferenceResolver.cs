@@ -164,7 +164,6 @@ namespace Microsoft.Framework.Runtime.Dependencies
                     "Reference Assemblies", "Microsoft", "Framework");
         }
 
-        
         private FrameworkInformation GetFrameworkInformation(NuGetFramework targetFramework)
         {
             var isMono = ((IRuntimeEnvironment)_services.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";

@@ -67,7 +67,7 @@ namespace Microsoft.Framework.PackageManager
                 c.OnExecute(async () =>
                 {
                     var feedOptions = feedCommandLineOptions.GetOptions();
-                    var isMono = ((IRuntimeEnvironment)_hostServices.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+                    var isMono = _runtimeEnv.RuntimeType == "Mono";
                     var command = new RestoreCommand(_environment, isMono);
                     command.Reports = CreateReports(optionVerbose.HasValue(), feedOptions.Quiet);
                     command.RestoreDirectory = argRoot.Value;
@@ -228,7 +228,7 @@ namespace Microsoft.Framework.PackageManager
                     addCmd.Version = argVersion.Value;
                     addCmd.ProjectDir = argProject.Value;
 
-                    var isMono = ((IRuntimeEnvironment)_hostServices.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+                    var isMono = _runtimeEnv.RuntimeType == "Mono";
                     var restoreCmd = new RestoreCommand(_environment, isMono);
                     restoreCmd.Reports = reports;
                     restoreCmd.FeedOptions = feedOptions;
@@ -514,7 +514,7 @@ namespace Microsoft.Framework.PackageManager
                     command.InPlace = optInPlace.HasValue();
                     command.Framework = optFramework.Value();
 
-                    var isMono = ((IRuntimeEnvironment)_hostServices.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+                    var isMono = _runtimeEnv.RuntimeType == "Mono";
                     var success = command.ExecuteCommand(isMono);
 
                     return success ? 0 : 1;

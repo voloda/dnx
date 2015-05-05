@@ -20,10 +20,12 @@ namespace Microsoft.Framework.DesignTimeHost
     public class Program
     {
         private readonly IServiceProvider _services;
+        private readonly IRuntimeEnvironment _runtimeEnv;
 
-        public Program(IServiceProvider services)
+        public Program(IServiceProvider services, IRuntimeEnvironment runtimeEnv)
         {
             _services = services;
+            _runtimeEnv = runtimeEnv;
         }
 
         public void Main(string[] args)
@@ -39,7 +41,7 @@ namespace Microsoft.Framework.DesignTimeHost
 
             // In mono 3.10, the Exited event fires immediately, so the
             // caller will need to terminate this process.
-            var isMono = ((IRuntimeEnvironment)_services.GetService(typeof(IRuntimeEnvironment))).RuntimeType == "Mono";
+            var isMono = _runtimeEnv.RuntimeType == "Mono";
             if (!isMono)
             {
                 // Add a watch to the host PID. If it goes away we will self terminate.

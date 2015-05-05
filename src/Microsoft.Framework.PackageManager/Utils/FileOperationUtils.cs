@@ -39,13 +39,6 @@ namespace Microsoft.Framework.PackageManager
 
         public static bool MarkExecutable(string file)
         {
-            var isWindows = ((IRuntimeEnvironment)CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IRuntimeEnvironment))).OperatingSystem == "Windows";
-            if (isWindows)
-            {
-                // This makes sense only on non Windows machines
-                return false;
-            }
-
             var processStartInfo = new ProcessStartInfo()
             {
                 UseShellExecute = false,
