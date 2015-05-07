@@ -49,7 +49,7 @@ namespace Microsoft.Framework.PackageManager
 
                 if (string.Equals(packageHash, installedPackageHash, StringComparison.Ordinal))
                 {
-                    information.WriteLine($"{library.Name.Bold()}.{library.Version} already exists");
+                    information.WriteLine($"{library.Name.Bold()}.{library.Version} already exists and won't be overwritten because it is identical");
                 }
                 else
                 {

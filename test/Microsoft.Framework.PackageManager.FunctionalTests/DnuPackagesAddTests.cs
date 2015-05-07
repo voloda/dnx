@@ -14,11 +14,11 @@ namespace Microsoft.Framework.PackageManager
 {
     public class DnuPackagesAddTests
     {
-        private static readonly string ProjectName = "HelloWorld";
+        private const string ProjectName = "HelloWorld";
         private static readonly SemanticVersion ProjectVersion = new SemanticVersion("0.1-beta");
-        private static readonly string Configuration = "Release";
-        private static readonly string PackagesDirName = "packages";
-        private static readonly string OutputDirName = "output";
+        private const string Configuration = "Release";
+        private const string PackagesDirName = "packages";
+        private const string OutputDirName = "output";
 
         public static IEnumerable<object[]> RuntimeComponents
         {
@@ -39,6 +39,7 @@ namespace Microsoft.Framework.PackageManager
                 var packagesDir = Path.Combine(tempSamplesDir, PackagesDirName);
                 var packagePathResolver = new DefaultPackagePathResolver(packagesDir);
                 var nuspecPath = packagePathResolver.GetManifestFilePath(ProjectName, ProjectVersion);
+                var hashFilePath = packagePathResolver.GetHashPath(ProjectName, ProjectVersion);
 
                 BuildPackage(tempSamplesDir, runtimeHomeDir);
 
@@ -48,11 +49,13 @@ namespace Microsoft.Framework.PackageManager
                 Assert.Contains($"Installing {ProjectName}.{ProjectVersion}", stdOut);
 
                 var lastInstallTime = new FileInfo(nuspecPath).LastWriteTimeUtc;
+                var hashBeforeReAdding = File.ReadAllText(hashFilePath);
 
                 exitCode = DnuPackagesAddOutputPackage(tempSamplesDir, runtimeHomeDir, out stdOut);
                 Assert.Equal(0, exitCode);
-                Assert.Contains($"{ProjectName}.{ProjectVersion} already exists", stdOut);
+                Assert.Contains($"{ProjectName}.{ProjectVersion} already exists and won't be overwritten because it is identical", stdOut);
                 Assert.Equal(lastInstallTime, new FileInfo(nuspecPath).LastWriteTimeUtc);
+                Assert.Equal(hashBeforeReAdding, File.ReadAllText(hashFilePath));
             }
         }
 
@@ -67,6 +70,9 @@ namespace Microsoft.Framework.PackageManager
                 var packagesDir = Path.Combine(tempSamplesDir, PackagesDirName);
                 var packagePathResolver = new DefaultPackagePathResolver(packagesDir);
                 var nuspecPath = packagePathResolver.GetManifestFilePath(ProjectName, ProjectVersion);
+                var hashFilePath = packagePathResolver.GetHashPath(ProjectName, ProjectVersion);
+                var outputPackagePath = Path.Combine(tempSamplesDir, OutputDirName, Configuration,
+                    $"{ProjectName}.{ProjectVersion}{NuGet.Constants.PackageExtension}");
 
                 SetProjectDescription(projectFilePath, "Old");
                 BuildPackage(tempSamplesDir, runtimeHomeDir);
@@ -77,9 +83,12 @@ namespace Microsoft.Framework.PackageManager
                 Assert.Contains($"Installing {ProjectName}.{ProjectVersion}", stdOut);
 
                 var lastInstallTime = new FileInfo(nuspecPath).LastWriteTimeUtc;
+                var hashBeforeReAdding = File.ReadAllText(hashFilePath);
 
                 SetProjectDescription(projectFilePath, "New");
                 BuildPackage(tempSamplesDir, runtimeHomeDir);
+
+                var newPackageHash = TestUtils.ComputeSHA(outputPackagePath);
 
                 exitCode = DnuPackagesAddOutputPackage(tempSamplesDir, runtimeHomeDir, out stdOut);
                 Assert.Equal(0, exitCode);
@@ -90,6 +99,8 @@ namespace Microsoft.Framework.PackageManager
                     .Single(x => string.Equals(x.Name.LocalName, "description")).Value;
                 Assert.Equal("New", actualDescription);
                 Assert.NotEqual(lastInstallTime, new FileInfo(nuspecPath).LastWriteTimeUtc);
+                Assert.NotEqual(hashBeforeReAdding, File.ReadAllText(hashFilePath));
+                Assert.Equal(newPackageHash, File.ReadAllText(hashFilePath));
             }
         }
 
