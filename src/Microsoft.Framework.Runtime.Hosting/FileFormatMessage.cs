@@ -28,9 +28,9 @@ namespace Microsoft.Framework.Runtime
             SourceFilePath = projectFilePath;
             Severity = severity;
 
-            StartColumn = jsonValue.Position.Column;
+            StartColumn = jsonValue.Column;
             EndColumn = StartColumn;
-            StartLine = jsonValue.Position.Line;
+            StartLine = jsonValue.Line;
             EndLine = StartLine;
         }
 

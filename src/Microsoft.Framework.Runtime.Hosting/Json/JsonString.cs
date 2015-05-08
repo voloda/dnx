@@ -6,8 +6,8 @@ namespace Microsoft.Framework.Runtime.Json
     {
         private readonly string _value;
 
-        public JsonString(string value, JsonPosition position)
-            : base(position)
+        public JsonString(string value, int line, int column)
+            : base(line, column)
         {
             if (value == null)
             {

@@ -5,8 +5,8 @@ namespace Microsoft.Framework.Runtime.Json
 {
     internal class JsonNull : JsonValue
     {
-        public JsonNull(JsonPosition position)
-            : base(position)
+        public JsonNull(int line, int column)
+            : base(line, column)
         {
         }
     }

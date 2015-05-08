@@ -53,7 +53,7 @@ namespace Microsoft.Framework.Runtime.Json
 
             if (next.Type == JsonTokenType.String)
             {
-                return new JsonString(next.Value, next.GetPosition());
+                return new JsonString(next.Value, next.Line, next.Column);
             }
 
             if (next.Type == JsonTokenType.True || next.Type == JsonTokenType.False)
@@ -63,7 +63,7 @@ namespace Microsoft.Framework.Runtime.Json
 
             if (next.Type == JsonTokenType.Null)
             {
-                return new JsonNull(next.GetPosition());
+                return new JsonNull(next.Line, next.Column);
             }
 
             if (next.Type == JsonTokenType.Number)
@@ -102,7 +102,7 @@ namespace Microsoft.Framework.Runtime.Json
                 }
             }
 
-            return new JsonArray(list.ToArray(), head.GetPosition());
+            return new JsonArray(list.ToArray(), head.Line, head.Column);
         }
 
         private static JsonObject DeserializeObject(JsonToken head, JsonBuffer buffer)
@@ -159,7 +159,7 @@ namespace Microsoft.Framework.Runtime.Json
                 }
             }
 
-            return new JsonObject(dictionary, head.GetPosition());
+            return new JsonObject(dictionary, head.Line, head.Column);
         }
     }
 }

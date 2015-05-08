@@ -9,8 +9,8 @@ namespace Microsoft.Framework.Runtime.Json
     {
         private readonly JsonValue[] _array;
 
-        public JsonArray(JsonValue[] array, JsonPosition position)
-            : base(position)
+        public JsonArray(JsonValue[] array, int line, int column)
+            : base(line, column)
         {
             if (array == null)
             {

@@ -25,9 +25,8 @@ namespace Microsoft.Framework.Runtime.Tests
             int value = json.Int;
 
             Assert.Equal(123, value);
-            Assert.NotNull(json.Position);
-            Assert.Equal(1, json.Position.Line);
-            Assert.Equal(321, json.Position.Column);
+            Assert.Equal(1, json.Line);
+            Assert.Equal(321, json.Column);
         }
 
         [Fact]
@@ -67,9 +66,8 @@ namespace Microsoft.Framework.Runtime.Tests
                 {
                     var number = list[i] as JsonNumber;
                     Assert.NotNull(number);
-                    Assert.NotNull(list[i].Position);
-                    Assert.Equal(1, list[i].Position.Line);
-                    Assert.Equal(2 + 2 * i, list[i].Position.Column);
+                    Assert.Equal(1, list[i].Line);
+                    Assert.Equal(2 + 2 * i, list[i].Column);
                     Assert.Equal(i + 1, number.Int);
                 }
             }
@@ -87,15 +85,13 @@ namespace Microsoft.Framework.Runtime.Tests
 
                 Assert.NotNull(list);
                 Assert.Equal(3, list.Count);
-                Assert.NotNull(list.Position);
-                Assert.Equal(1, list.Position.Line);
-                Assert.Equal(1, list.Position.Column);
+                Assert.Equal(1, list.Line);
+                Assert.Equal(1, list.Column);
 
                 for (int i = 0; i < 3; ++i)
                 {
-                    Assert.NotNull(list[i].Position);
-                    Assert.Equal(1, list[i].Position.Line);
-                    Assert.Equal(2 + 5 * i, list[i].Position.Column);
+                    Assert.Equal(1, list[i].Line);
+                    Assert.Equal(2 + 5 * i, list[i].Column);
 
                     var jstring = list[i] as JsonString;
                     Assert.NotNull(jstring);
@@ -136,9 +132,8 @@ namespace Microsoft.Framework.Runtime.Tests
                 Assert.Equal("value1", jobject.ValueAsString("key1"));
                 Assert.Equal(99, ((JsonNumber)jobject.Value("key2")).Int);
                 Assert.Equal(true, jobject.ValueAsBoolean("key3"));
-                Assert.NotNull(jobject.Position);
-                Assert.Equal(2, jobject.Position.Line);
-                Assert.Equal(13, jobject.Position.Column);
+                Assert.Equal(2, jobject.Line);
+                Assert.Equal(13, jobject.Column);
 
                 var list = jobject.ValueAsStringArray("key4");
                 Assert.NotNull(list);
@@ -149,9 +144,9 @@ namespace Microsoft.Framework.Runtime.Tests
 
                 var rawList = jobject.Value("key4") as JsonArray;
                 Assert.NotNull(rawList);
-                Assert.NotNull(rawList.Position);
-                Assert.Equal(6, rawList.Position.Line);
-                Assert.Equal(25, rawList.Position.Column);
+                Assert.NotNull(rawList);
+                Assert.Equal(6, rawList.Line);
+                Assert.Equal(25, rawList.Column);
 
                 var subObject = jobject.ValueAsJsonObject("key5");
                 Assert.NotNull(subObject);
@@ -162,9 +157,8 @@ namespace Microsoft.Framework.Runtime.Tests
                 Assert.Equal(2, subArray.Count);
                 Assert.Equal(1, ((JsonNumber)subArray[0]).Int);
                 Assert.Equal(2, ((JsonNumber)subArray[1]).Int);
-                Assert.NotNull(subArray.Position);
-                Assert.Equal(9, subArray.Position.Line);
-                Assert.Equal(32, subArray.Position.Column);
+                Assert.Equal(9, subArray.Line);
+                Assert.Equal(32, subArray.Column);
 
                 var nullValue = jobject.Value("key6");
                 Assert.NotNull(nullValue);

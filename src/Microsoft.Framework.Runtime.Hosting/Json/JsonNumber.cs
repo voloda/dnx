@@ -12,7 +12,7 @@ namespace Microsoft.Framework.Runtime.Json
         private readonly double _double;
 
         public JsonNumber(JsonToken token)
-            : base(token.GetPosition())
+            : base(token.Line, token.Column)
         {
             try
             {

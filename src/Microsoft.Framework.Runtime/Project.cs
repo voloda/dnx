@@ -360,7 +360,6 @@ namespace Microsoft.Framework.Runtime
                 {
                     if (string.IsNullOrEmpty(dependencyKey))
                     {
-                        // TODO: add line information
                         throw FileFormatException.Create(
                             "Unable to resolve dependency ''.",
                             dependencies.Value(dependencyKey),
@@ -420,8 +419,8 @@ namespace Microsoft.Framework.Runtime
                             VersionRange = dependencyVersionRange,
                             IsGacOrFrameworkReference = isGacOrFrameworkReference,
                             FileName = projectPath,
-                            Line = dependencyValue.Position.Line,
-                            Column = dependencyValue.Position.Column
+                            Line = dependencyValue.Line,
+                            Column = dependencyValue.Column
                         },
                         Type = dependencyTypeValue
                     });

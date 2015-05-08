@@ -41,7 +41,7 @@ namespace Microsoft.Framework.Runtime
         {
             var result = new FileFormatException(exception.Message, exception)
                 .WithFilePath(filePath)
-                .WithLineInfo(jsonValue.Position);
+                .WithLineInfo(jsonValue);
 
             return result;
         }
@@ -58,20 +58,20 @@ namespace Microsoft.Framework.Runtime
         {
             var result = new FileFormatException(message)
                 .WithFilePath(filePath)
-                .WithLineInfo(jsonValue.Position);
+                .WithLineInfo(jsonValue);
 
             return result;
         }
 
-        private FileFormatException WithLineInfo(JsonPosition position)
+        private FileFormatException WithLineInfo(JsonValue value)
         {
-            if (position == null)
+            if (value == null)
             {
-                throw new ArgumentNullException(nameof(position));
+                throw new ArgumentNullException(nameof(value));
             }
 
-            Line = position.Line;
-            Column = position.Column;
+            Line = value.Line;
+            Column = value.Column;
 
             return this;
         }

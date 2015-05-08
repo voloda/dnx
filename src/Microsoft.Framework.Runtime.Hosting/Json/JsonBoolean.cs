@@ -8,7 +8,7 @@ namespace Microsoft.Framework.Runtime.Json
     internal class JsonBoolean : JsonValue
     {
         public JsonBoolean(JsonToken token)
-            : base(token.GetPosition())
+            : base(token.Line, token.Column)
         {
             if (token.Type == JsonTokenType.True)
             {

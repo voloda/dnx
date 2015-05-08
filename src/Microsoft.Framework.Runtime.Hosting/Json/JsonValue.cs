@@ -5,11 +5,14 @@ namespace Microsoft.Framework.Runtime.Json
 {
     internal class JsonValue
     {
-        public JsonValue(JsonPosition position)
+        public JsonValue(int line, int column)
         {
-            Position = position;
+            Line = line;
+            Column = column;
         }
 
-        public JsonPosition Position { get; private set; }
+        public int Line { get; }
+
+        public int Column { get; }
     }
 }

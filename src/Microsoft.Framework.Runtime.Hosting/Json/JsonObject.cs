@@ -10,8 +10,8 @@ namespace Microsoft.Framework.Runtime.Json
     {
         private readonly IDictionary<string, JsonValue> _data;
 
-        public JsonObject(IDictionary<string, JsonValue> data, JsonPosition position)
-            : base(position)
+        public JsonObject(IDictionary<string, JsonValue> data, int line, int column)
+            : base(line, column)
         {
             if (data == null)
             {

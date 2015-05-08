@@ -9,10 +9,5 @@ namespace Microsoft.Framework.Runtime.Json
         public string Value;
         public int Line;
         public int Column;
-
-        public JsonPosition GetPosition()
-        {
-            return new JsonPosition(Line, Column);
-        }
     }
 }
