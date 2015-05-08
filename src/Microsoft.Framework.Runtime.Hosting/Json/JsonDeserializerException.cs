@@ -35,8 +35,8 @@ namespace Microsoft.Framework.Runtime.Json
             Column = nextToken.Column;
         }
 
-        public int Line { get; private set; }
+        public int Line { get; }
 
-        public int Column { get; private set; }
+        public int Column { get; }
     }
 }

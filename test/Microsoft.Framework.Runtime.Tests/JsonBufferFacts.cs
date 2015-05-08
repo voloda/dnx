@@ -50,13 +50,11 @@ namespace Microsoft.Framework.Runtime.Json.Tests
         }
 
         [Theory]
-        [InlineData("true", JsonTokenType.True)]
-        [InlineData(" true", JsonTokenType.True)]
-        [InlineData("\ttrue", JsonTokenType.True)]
-        [InlineData(" \ntrue", JsonTokenType.True)]
-        [InlineData("false", JsonTokenType.False)]
-        [InlineData("null", JsonTokenType.Null)]
-        public void ReadLiteral(string content, JsonTokenType type)
+        [InlineData("true")]
+        [InlineData(" true")]
+        [InlineData("\ttrue")]
+        [InlineData(" \ntrue")]
+        public void ReadLiteral(string content)
         {
             using (var stream = CreateTextReader(content))
             {
@@ -64,7 +62,38 @@ namespace Microsoft.Framework.Runtime.Json.Tests
                 Assert.NotNull(buffer);
 
                 var token = buffer.Read();
-                Assert.Equal(type, token.Type);
+                Assert.Equal(type, JsonTokenType.True);
+            }
+        }
+
+        [InlineData("false")]
+        [InlineData("false\n")]
+        [InlineData("\t\nfalse")]
+        public void ReadLiteralFalse(string content)
+        {
+            using (var stream = CreateTextReader(content))
+            {
+                var buffer = new JsonBuffer(stream);
+                Assert.NotNull(buffer);
+
+                var token = buffer.Read();
+                Assert.Equal(type, JsonTokenType.False);
+            }
+        }
+
+        [InlineData("null", JsonTokenType.Null)]
+        [InlineData(" null", JsonTokenType.Null)]
+        [InlineData(" null ", JsonTokenType.Null)]
+        [InlineData("\tnull ", JsonTokenType.Null)]
+        public void ReadLiteralNull(string content)
+        {
+            using (var stream = CreateTextReader(content))
+            {
+                var buffer = new JsonBuffer(stream);
+                Assert.NotNull(buffer);
+
+                var token = buffer.Read();
+                Assert.Equal(type, JsonTokenType.Null);
             }
         }
 

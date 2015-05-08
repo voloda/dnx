@@ -6,44 +6,7 @@ using System.Globalization;
 
 namespace Microsoft.Framework.Runtime.Json
 {
-    internal class JsonPrimitive : JsonValue
-    {
-        public JsonPrimitive(JsonPosition position) : base(position) { }
-    }
-
-    internal class JsonNull : JsonPrimitive
-    {
-        public JsonNull(JsonPosition position) : base(position) { }
-    }
-
-    internal class JsonBoolean : JsonPrimitive
-    {
-        public JsonBoolean(JsonToken token)
-            : base(token.GetPosition())
-        {
-            if (token.Type == JsonTokenType.True)
-            {
-                Value = true;
-            }
-            else if (token.Type == JsonTokenType.False)
-            {
-                Value = false;
-            }
-            else
-            {
-                throw new ArgumentException("Token value should be either True or False.", nameof(token));
-            }
-        }
-
-        public bool Value { get; private set; }
-
-        public static implicit operator bool (JsonBoolean jsonBoolean)
-        {
-            return jsonBoolean.Value;
-        }
-    }
-
-    internal class JsonNumber : JsonPrimitive
+    internal class JsonNumber : JsonValue
     {
         private readonly string _raw;
         private readonly double _double;

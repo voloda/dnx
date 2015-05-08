@@ -3,16 +3,11 @@
 
 namespace Microsoft.Framework.Runtime.Json
 {
-    internal struct JsonToken
+    internal class JsonNull : JsonValue
     {
-        public JsonTokenType Type;
-        public string Value;
-        public int Line;
-        public int Column;
-
-        public JsonPosition GetPosition()
+        public JsonNull(JsonPosition position)
+            : base(position)
         {
-            return new JsonPosition(Line, Column);
         }
     }
 }

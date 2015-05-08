@@ -25,7 +25,7 @@ namespace Microsoft.Framework.Runtime.Json
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (((Line << 5) + Line) ^ Column);
         }
     }
 }
