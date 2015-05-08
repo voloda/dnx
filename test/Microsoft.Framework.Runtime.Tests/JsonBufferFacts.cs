@@ -62,7 +62,7 @@ namespace Microsoft.Framework.Runtime.Json.Tests
                 Assert.NotNull(buffer);
 
                 var token = buffer.Read();
-                Assert.Equal(type, JsonTokenType.True);
+                Assert.Equal(JsonTokenType.True, token.Type);
             }
         }
 
@@ -77,7 +77,7 @@ namespace Microsoft.Framework.Runtime.Json.Tests
                 Assert.NotNull(buffer);
 
                 var token = buffer.Read();
-                Assert.Equal(type, JsonTokenType.False);
+                Assert.Equal(JsonTokenType.False, token.Type);
             }
         }
 
@@ -93,7 +93,7 @@ namespace Microsoft.Framework.Runtime.Json.Tests
                 Assert.NotNull(buffer);
 
                 var token = buffer.Read();
-                Assert.Equal(type, JsonTokenType.Null);
+                Assert.Equal(JsonTokenType.Null, token.Type);
             }
         }
 
