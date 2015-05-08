@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Microsoft.Framework.Runtime.Json
 {
@@ -42,51 +43,51 @@ namespace Microsoft.Framework.Runtime.Json
                 }
             }
 
-            if (first == JsonConstants.LeftCurlyBracket)
+            if (first == '{')
             {
                 result.Type = JsonTokenType.LeftCurlyBracket;
             }
-            else if (first == JsonConstants.RightCurlyBracket)
+            else if (first == '}')
             {
                 result.Type = JsonTokenType.RightCurlyBracket;
             }
-            else if (first == JsonConstants.LeftSquareBracket)
+            else if (first == '[')
             {
                 result.Type = JsonTokenType.LeftSquareBracket;
             }
-            else if (first == JsonConstants.RightSquareBracket)
+            else if (first == ']')
             {
                 result.Type = JsonTokenType.RightSquareBracket;
             }
-            else if (first == JsonConstants.Colon)
+            else if (first == ':')
             {
                 result.Type = JsonTokenType.Colon;
             }
-            else if (first == JsonConstants.Comma)
+            else if (first == ',')
             {
                 result.Type = JsonTokenType.Comma;
             }
-            else if (first == JsonConstants.Quotation)
+            else if (first == '"')
             {
                 result.Type = JsonTokenType.String;
                 result.Value = ReadString();
             }
-            else if (first == (int)'t')
+            else if (first == 't')
             {
                 ReadLiteral(JsonConstants.ValueTrue);
                 result.Type = JsonTokenType.True;
             }
-            else if (first == (int)'f')
+            else if (first == 'f')
             {
                 ReadLiteral(JsonConstants.ValueFalse);
                 result.Type = JsonTokenType.False;
             }
-            else if (first == (int)'n')
+            else if (first == 'n')
             {
                 ReadLiteral(JsonConstants.ValueNull);
                 result.Type = JsonTokenType.Null;
             }
-            else if (char.IsDigit((char)first) || first == (int)'-')
+            else if ((first >= '0' && first <= '9') || first == '-')
             {
                 result.Type = JsonTokenType.Number;
                 result.Value = ReadNumber(first);
@@ -111,7 +112,7 @@ namespace Microsoft.Framework.Runtime.Json
                     // This is the end of file
                     return -1;
                 }
-                else if (value == JsonConstants.LF)
+                else if (value == JsonConstants.LineFeed)
                 {
                     // This is a new line. Let the next loop read the first charactor of the following line.
                     // Set position ahead of next line
@@ -120,7 +121,7 @@ namespace Microsoft.Framework.Runtime.Json
 
                     continue;
                 }
-                else if (value == JsonConstants.CR)
+                else if (value == JsonConstants.CarriageReturn)
                 {
                     // Skip the carriage return.
                     // Let the next loop read the following char
@@ -135,17 +136,19 @@ namespace Microsoft.Framework.Runtime.Json
 
         private string ReadNumber(int firstRead)
         {
-            var buf = new List<char> { (char)firstRead };
+            var buf = new StringBuilder();
+            buf.Append((char)firstRead);
+
             while (true)
             {
                 var next = _reader.Peek();
 
-                if (char.IsDigit((char)next) ||
-                    next == JsonConstants.FullStop ||
-                    next == JsonConstants.UpperE ||
-                    next == JsonConstants.LowerE)
+                if ((next >= '0' && next <= '9') ||
+                    next == '.' ||
+                    next == 'e' ||
+                    next == 'E')
                 {
-                    buf.Add((char)ReadNextChar());
+                    buf.Append((char)ReadNextChar());
                 }
                 else
                 {
@@ -153,7 +156,7 @@ namespace Microsoft.Framework.Runtime.Json
                 }
             }
 
-            return new string(buf.ToArray());
+            return buf.ToString();
         }
 
         private void ReadLiteral(string literal)
@@ -174,11 +177,11 @@ namespace Microsoft.Framework.Runtime.Json
             }
 
             var tail = _reader.Peek();
-            if (tail != JsonConstants.RightCurlyBracket &&
-                tail != JsonConstants.RightSquareBracket &&
-                tail != JsonConstants.CR &&
-                tail != JsonConstants.LF &&
-                tail != JsonConstants.Comma &&
+            if (tail != '}' &&
+                tail != ']' &&
+                tail != JsonConstants.CarriageReturn &&
+                tail != JsonConstants.LineFeed &&
+                tail != ',' &&
                 tail != -1 &&
                 !IsWhitespace(tail))
             {
@@ -190,62 +193,55 @@ namespace Microsoft.Framework.Runtime.Json
 
         private string ReadString()
         {
-            var buf = new List<char>();
+            var buf = new StringBuilder();
             var escaped = false;
 
             while (true)
             {
                 var next = ReadNextChar();
 
-                if (next == -1 || next == JsonConstants.LF)
+                if (next == -1 || next == JsonConstants.LineFeed)
                 {
                     throw new JsonDeserializerException(JsonDeserializerResource.JSON_OpenString, _line, _column);
                 }
                 else if (escaped)
                 {
-                    if (next == JsonConstants.Quotation)
+                    if ((next == '"') || (next == '\\') || (next == '/'))
                     {
-                        buf.Add((char)JsonConstants.Quotation);
+                        buf.Append((char)next);
                     }
-                    else if (next == JsonConstants.ReverseSolidus)
-                    {
-                        buf.Add((char)JsonConstants.ReverseSolidus);
-                    }
-                    else if (next == JsonConstants.Solidus)
-                    {
-                        buf.Add((char)JsonConstants.Solidus);
-                    }
-                    else if (next == 0x62)
+                    else if (next == 'b')
                     {
                         // '\b' backspace
-                        buf.Add((char)JsonConstants.BACKSPACE);
+                        buf.Append((char)JsonConstants.BACKSPACE);
                     }
-                    else if (next == 0x66)
+                    else if (next == 'f')
                     {
                         // '\f' form feed
-                        buf.Add((char)JsonConstants.FF);
+                        buf.Append((char)JsonConstants.FormFeed);
                     }
-                    else if (next == 0x6E)
+                    else if (next == 'n')
                     {
                         // '\n' line feed
-                        buf.Add((char)JsonConstants.LF);
+                        buf.Append((char)JsonConstants.LineFeed);
                     }
-                    else if (next == 0x72)
+                    else if (next == 'r')
                     {
                         // '\r' carriage return
-                        buf.Add((char)JsonConstants.CR);
+                        buf.Append((char)JsonConstants.CarriageReturn);
                     }
-                    else if (next == 0x74)
+                    else if (next == 't')
                     {
                         // '\t' tab
-                        buf.Add((char)JsonConstants.HT);
+                        buf.Append((char)JsonConstants.HorizontalTab);
                     }
-                    else if (next == 0x75)
+                    else if (next == 'u')
                     {
+                        // '\uXXXX' unicode
                         var unicodeLine = _line;
                         var unicodeColumn = _column;
 
-                        var unicodes = new char[4];
+                        var unicodesBuf = new StringBuilder(4);
                         for (int i = 0; i < 4; ++i)
                         {
                             next = ReadNextChar();
@@ -255,18 +251,18 @@ namespace Microsoft.Framework.Runtime.Json
                             }
                             else
                             {
-                                unicodes[i] = (char)next;
+                                unicodesBuf[i] = (char)next;
                             }
                         }
 
                         try
                         {
-                            var unicodeValue = int.Parse(new string(unicodes), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-                            buf.Add((char)unicodeValue);
+                            var unicodeValue = int.Parse(unicodesBuf.ToString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                            buf.Append((char)unicodeValue);
                         }
                         catch (FormatException ex)
                         {
-                            throw new JsonDeserializerException("Invalid Unicode format [" + new string(unicodes) + "]", ex, unicodeLine, unicodeColumn);
+                            throw new JsonDeserializerException("Invalid Unicode format [" + unicodesBuf.ToString() + "]", ex, unicodeLine, unicodeColumn);
                         }
                     }
                     else
@@ -276,26 +272,26 @@ namespace Microsoft.Framework.Runtime.Json
 
                     escaped = false;
                 }
-                else if (next == JsonConstants.ReverseSolidus)
+                else if (next == '\\')
                 {
                     escaped = true;
                 }
-                else if (next == JsonConstants.Quotation)
+                else if (next == '"')
                 {
                     break;
                 }
                 else
                 {
-                    buf.Add((char)next);
+                    buf.Append((char)next);
                 }
             }
 
-            return new string(buf.ToArray());
+            return buf.ToString();
         }
 
         private static bool IsWhitespace(int value)
         {
-            return value == JsonConstants.SP || value == JsonConstants.HT || value == JsonConstants.CR;
+            return value == JsonConstants.SP || value == JsonConstants.HorizontalTab || value == JsonConstants.CarriageReturn;
         }
     }
 }
