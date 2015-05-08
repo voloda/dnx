@@ -59,9 +59,10 @@ namespace Microsoft.Framework.Runtime.Json
         {
             return ValueAs(key, value =>
             {
-                if (value != null && value is JsonBoolean)
+                var boolVal = value as JsonBoolean;
+                if (boolVal != null)
                 {
-                    return (value as JsonBoolean).Value;
+                    return boolVal.Value;
                 }
 
                 return defaultValue;
@@ -72,14 +73,13 @@ namespace Microsoft.Framework.Runtime.Json
         {
             return ValueAs<bool?>(key, value =>
             {
-                if (value != null && value is JsonBoolean)
+                var boolVal = value as JsonBoolean;
+                if (boolVal != null)
                 {
-                    return (value as JsonBoolean).Value;
+                    return boolVal.Value;
                 }
-                else
-                {
-                    return null;
-                }
+
+                return null;
             });
         }
 
