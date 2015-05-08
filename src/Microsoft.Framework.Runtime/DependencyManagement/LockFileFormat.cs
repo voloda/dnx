@@ -36,9 +36,8 @@ namespace Microsoft.Framework.Runtime.DependencyManagement
         {
             try
             {
-                var deserializer = new JsonDeserializer();
                 var reader = new StreamReader(stream);
-                var jobject = deserializer.Deserialize(reader) as JsonObject;
+                var jobject = JsonDeserializer.Deserialize(reader) as JsonObject;
 
                 if (jobject != null)
                 {

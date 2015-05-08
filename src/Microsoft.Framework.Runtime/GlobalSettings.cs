@@ -41,9 +41,8 @@ namespace Microsoft.Framework.Runtime
             {
                 using (var fs = File.OpenRead(globalJsonPath))
                 {
-                    var deserializer = new JsonDeserializer();
                     var reader = new StreamReader(fs);
-                    var jobject = deserializer.Deserialize(reader) as JsonObject;
+                    var jobject = JsonDeserializer.Deserialize(reader) as JsonObject;
 
                     if (jobject == null)
                     {

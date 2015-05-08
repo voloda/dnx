@@ -33,11 +33,9 @@ namespace Microsoft.Framework.Runtime.Tests
         [Fact]
         public void DeserialzeEmptyString()
         {
-            var target = new JsonDeserializer();
-
             using (var reader = GetReader(string.Empty))
             {
-                var result = target.Deserialize(reader);
+                var result = JsonDeserializer.Deserialize(reader);
                 Assert.Null(result);
             }
         }
@@ -45,11 +43,9 @@ namespace Microsoft.Framework.Runtime.Tests
         [Fact]
         public void DeserializeEmptyArray()
         {
-            var target = new JsonDeserializer();
-
             using (var reader = GetReader("[]"))
             {
-                var result = target.Deserialize(reader) as JsonArray;
+                var result = JsonDeserializer.Deserialize(reader) as JsonArray;
                 Assert.NotNull(result);
                 Assert.Equal(0, result.Count);
             }
@@ -60,9 +56,7 @@ namespace Microsoft.Framework.Runtime.Tests
         {
             using (var reader = GetReader("[1,2,3]"))
             {
-                var target = new JsonDeserializer();
-
-                var raw = target.Deserialize(reader);
+                var raw = JsonDeserializer.Deserialize(reader);
                 Assert.NotNull(raw);
 
                 var list = raw as JsonArray;
@@ -86,9 +80,7 @@ namespace Microsoft.Framework.Runtime.Tests
         {
             using (var reader = GetReader(@"[""a"", ""b"", ""c"" ]"))
             {
-                var target = new JsonDeserializer();
-
-                var raw = target.Deserialize(reader);
+                var raw = JsonDeserializer.Deserialize(reader);
                 Assert.NotNull(raw);
 
                 var list = raw as JsonArray;
@@ -135,9 +127,7 @@ namespace Microsoft.Framework.Runtime.Tests
 
             using (var reader = GetReader(content))
             {
-                var target = new JsonDeserializer();
-
-                var raw = target.Deserialize(reader);
+                var raw = JsonDeserializer.Deserialize(reader);
 
                 Assert.NotNull(raw);
 
@@ -187,9 +177,8 @@ namespace Microsoft.Framework.Runtime.Tests
         {
             using (var fs = File.OpenRead(".\\TestSample\\project.lock.sample"))
             {
-                var deserializer = new JsonDeserializer();
                 var reader = new StreamReader(fs);
-                var raw = deserializer.Deserialize(reader);
+                var raw = JsonDeserializer.Deserialize(reader);
 
                 Assert.NotNull(raw);
                 Assert.True(raw is JsonObject);

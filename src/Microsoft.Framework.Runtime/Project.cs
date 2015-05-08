@@ -168,9 +168,8 @@ namespace Microsoft.Framework.Runtime
         {
             var project = new Project();
 
-            var deserializer = new JsonDeserializer();
             var reader = new StreamReader(stream);
-            var rawProject = deserializer.Deserialize(reader) as JsonObject;
+            var rawProject = JsonDeserializer.Deserialize(reader) as JsonObject;
             if (rawProject == null)
             {
                 throw FileFormatException.Create(

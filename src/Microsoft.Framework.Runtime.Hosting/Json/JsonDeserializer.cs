@@ -7,27 +7,25 @@ using System.IO;
 
 namespace Microsoft.Framework.Runtime.Json
 {
-    internal class JsonDeserializer
+    internal static class JsonDeserializer
     {
-        private JsonBuffer _buffer;
-
-        public JsonValue Deserialize(TextReader reader)
+        public static JsonValue Deserialize(TextReader reader)
         {
             if (reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
             }
 
-            _buffer = new JsonBuffer(reader);
-            return Deserialize();
+            var buffer = new JsonBuffer(reader);
+            return Deserialize(buffer);
         }
 
-        private JsonValue Deserialize()
+        private static JsonValue Deserialize(JsonBuffer buffer)
         {
-            var result = DeserializeInternal(_buffer.Read());
+            var result = DeserializeInternal(buffer.Read(), buffer);
 
             // There are still unprocessed char. The parsing is not finished. Error happened.
-            var nextToken = _buffer.Read();
+            var nextToken = buffer.Read();
             if (nextToken.Type != JsonTokenType.EOL)
             {
                 throw new JsonDeserializerException("Failed to continue deserializing. Additional token " + nextToken.Value, nextToken);
@@ -36,7 +34,7 @@ namespace Microsoft.Framework.Runtime.Json
             return result;
         }
 
-        private JsonValue DeserializeInternal(JsonToken next)
+        private static JsonValue DeserializeInternal(JsonToken next, JsonBuffer buffer)
         {
             if (next.Type == JsonTokenType.EOL)
             {
@@ -45,12 +43,12 @@ namespace Microsoft.Framework.Runtime.Json
 
             if (next.Type == JsonTokenType.LeftSquareBracket)
             {
-                return DeserializeArray(next);
+                return DeserializeArray(next, buffer);
             }
 
             if (next.Type == JsonTokenType.LeftCurlyBracket)
             {
-                return DeserializeObject(next);
+                return DeserializeObject(next, buffer);
             }
 
             if (next.Type == JsonTokenType.String)
@@ -76,20 +74,20 @@ namespace Microsoft.Framework.Runtime.Json
             throw new JsonDeserializerException(JsonDeserializerResource.Format_UnexpectedToken(next.Value, next.Type), next);
         }
 
-        private JsonArray DeserializeArray(JsonToken head)
+        private static JsonArray DeserializeArray(JsonToken head, JsonBuffer buffer)
         {
             var list = new List<JsonValue>();
             while (true)
             {
-                var next = _buffer.Read();
+                var next = buffer.Read();
                 if (next.Type == JsonTokenType.RightSquareBracket)
                 {
                     break;
                 }
 
-                list.Add(DeserializeInternal(next));
+                list.Add(DeserializeInternal(next, buffer));
 
-                next = _buffer.Read();
+                next = buffer.Read();
                 if (next.Type == JsonTokenType.EOL)
                 {
                     throw new JsonDeserializerException(JsonDeserializerResource.JSON_InvalidArrayEnd, next);
@@ -107,14 +105,14 @@ namespace Microsoft.Framework.Runtime.Json
             return new JsonArray(list.ToArray(), head.GetPosition());
         }
 
-        private JsonObject DeserializeObject(JsonToken head)
+        private static JsonObject DeserializeObject(JsonToken head, JsonBuffer buffer)
         {
             var dictionary = new Dictionary<string, JsonValue>();
 
             // Loop through each JSON entry in the input object
             while (true)
             {
-                var next = _buffer.Read();
+                var next = buffer.Read();
                 if (next.Type == JsonTokenType.EOL)
                 {
                     throw new JsonDeserializerException(JsonDeserializerResource.JSON_InvalidObject, next);
@@ -141,15 +139,15 @@ namespace Microsoft.Framework.Runtime.Json
                         throw new JsonDeserializerException(JsonDeserializerResource.Format_DuplicateObjectMemberName(memberName), next);
                     }
 
-                    next = _buffer.Read();
+                    next = buffer.Read();
                     if (next.Type != JsonTokenType.Colon)
                     {
                         throw new JsonDeserializerException(JsonDeserializerResource.JSON_InvalidObject, next);
                     }
 
-                    dictionary[memberName] = DeserializeInternal(_buffer.Read());
+                    dictionary[memberName] = DeserializeInternal(buffer.Read(), buffer);
 
-                    next = _buffer.Read();
+                    next = buffer.Read();
                     if (next.Type == JsonTokenType.RightCurlyBracket)
                     {
                         break;

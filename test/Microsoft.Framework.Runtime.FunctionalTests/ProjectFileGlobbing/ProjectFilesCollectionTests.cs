@@ -521,8 +521,7 @@ namespace Microsoft.Framework.Runtime.FunctionalTests.ProjectFileGlobbing
         {
             using (var reader = new StringReader(jsonContent))
             {
-                var deserializer = new JsonDeserializer();
-                var rawProject = deserializer.Deserialize(reader) as JsonObject;
+                var rawProject = JsonDeserializer.Deserialize(reader) as JsonObject;
 
                 projectDir = Path.Combine(Root.DirPath, PathHelper.NormalizeSeparator(projectDir));
                 var filesCollection = new ProjectFilesCollection(rawProject, projectDir, string.Empty);

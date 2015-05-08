@@ -115,8 +115,7 @@ namespace Microsoft.Framework.Runtime.Tests.FileGlobbing
         {
             using (var reader = new StringReader(content))
             {
-                var deserializer = new JsonDeserializer();
-                return deserializer.Deserialize(reader) as JsonObject;
+                return JsonDeserializer.Deserialize(reader) as JsonObject;
             }
         }
 
