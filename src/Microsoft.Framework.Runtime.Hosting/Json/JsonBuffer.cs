@@ -11,30 +11,27 @@ namespace Microsoft.Framework.Runtime.Json
     internal class JsonBuffer
     {
         private readonly TextReader _reader;
-
-        private int _line = 1;
+        private JsonToken _token;
+        private int _line;
         private int _column;
 
         public JsonBuffer(TextReader reader)
         {
             _reader = reader;
+            _line = 1;
         }
 
         public JsonToken Read()
         {
-            var result = new JsonToken();
-
             int first;
             while (true)
             {
                 first = ReadNextChar();
-                result.Line = _line;
-                result.Column = _column;
 
                 if (first == -1)
                 {
-                    result.Type = JsonTokenType.EOL;
-                    return result;
+                    _token.Type = JsonTokenType.EOL;
+                    return _token;
                 }
                 else if (!IsWhitespace(first))
                 {
@@ -42,61 +39,66 @@ namespace Microsoft.Framework.Runtime.Json
                 }
             }
 
+            _token.Value = null;
+            _token.Line = _line;
+            _token.Column = _column;
+
             if (first == '{')
             {
-                result.Type = JsonTokenType.LeftCurlyBracket;
+                _token.Type = JsonTokenType.LeftCurlyBracket;
             }
             else if (first == '}')
             {
-                result.Type = JsonTokenType.RightCurlyBracket;
+                _token.Type = JsonTokenType.RightCurlyBracket;
             }
             else if (first == '[')
             {
-                result.Type = JsonTokenType.LeftSquareBracket;
+                _token.Type = JsonTokenType.LeftSquareBracket;
             }
             else if (first == ']')
             {
-                result.Type = JsonTokenType.RightSquareBracket;
+                _token.Type = JsonTokenType.RightSquareBracket;
             }
             else if (first == ':')
             {
-                result.Type = JsonTokenType.Colon;
+                _token.Type = JsonTokenType.Colon;
             }
             else if (first == ',')
             {
-                result.Type = JsonTokenType.Comma;
+                _token.Type = JsonTokenType.Comma;
             }
             else if (first == '"')
             {
-                result.Type = JsonTokenType.String;
-                result.Value = ReadString();
+                _token.Type = JsonTokenType.String;
+                _token.Value = ReadString();
             }
             else if (first == 't')
             {
                 ReadLiteral(JsonConstants.ValueTrue);
-                result.Type = JsonTokenType.True;
+                _token.Type = JsonTokenType.True;
             }
             else if (first == 'f')
             {
                 ReadLiteral(JsonConstants.ValueFalse);
-                result.Type = JsonTokenType.False;
+                _token.Type = JsonTokenType.False;
             }
             else if (first == 'n')
             {
                 ReadLiteral(JsonConstants.ValueNull);
-                result.Type = JsonTokenType.Null;
+                _token.Type = JsonTokenType.Null;
             }
             else if ((first >= '0' && first <= '9') || first == '-')
             {
-                result.Type = JsonTokenType.Number;
-                result.Value = ReadNumber(first);
+                _token.Type = JsonTokenType.Number;
+                _token.Value = ReadNumber(first);
             }
             else
             {
-                throw new JsonDeserializerException(string.Format("Illegal character {0:X4}.", first), result.GetPosition());
+                throw new JsonDeserializerException(string.Format("Illegal character {0:X4}.", first), _line, _column);
             }
 
-            return result;
+            // JsonToken is a value type
+            return _token;
         }
 
         private int ReadNextChar()
@@ -104,7 +106,7 @@ namespace Microsoft.Framework.Runtime.Json
             while (true)
             {
                 var value = _reader.Read();
-                _column += 1;
+                _column++;
 
                 if (value == -1)
                 {
@@ -116,7 +118,7 @@ namespace Microsoft.Framework.Runtime.Json
                     // This is a new line. Let the next loop read the first charactor of the following line.
                     // Set position ahead of next line
                     _column = 0;
-                    _line += 1;
+                    _line++;
 
                     continue;
                 }
@@ -201,7 +203,9 @@ namespace Microsoft.Framework.Runtime.Json
 
                 if (next == -1 || next == JsonConstants.LineFeed)
                 {
-                    throw new JsonDeserializerException(JsonDeserializerResource.JSON_OpenString, _line, _column);
+                    throw new JsonDeserializerException(
+                        JsonDeserializerResource.JSON_OpenString,
+                        _line, _column);
                 }
                 else if (escaped)
                 {

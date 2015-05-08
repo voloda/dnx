@@ -21,13 +21,6 @@ namespace Microsoft.Framework.Runtime.Json
             Column = column;
         }
 
-        public JsonDeserializerException(string message, JsonPosition position)
-            : base(message)
-        {
-            Line = position.Line;
-            Column = position.Column;
-        }
-
         public JsonDeserializerException(string message, JsonToken nextToken)
             : base(message)
         {
